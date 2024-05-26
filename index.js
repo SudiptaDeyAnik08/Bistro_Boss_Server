@@ -28,11 +28,37 @@ async function run() {
 
     const database = client.db("bistroDb");
     const menuCollection = database.collection("menu");
+    const userCollection = database.collection("users");
 
 
     const reivewDB = client.db("bistroDb");
     const reviewsCollection = reivewDB.collection("reviews");
     const cartsCollection = reivewDB.collection("carts");
+
+    //User Related API
+    app.post('/users', async(req,res)=>{
+      const user = req.body;
+      
+      const  query = {email:user.email}
+      const existingUser = await userCollection.findOne(query)
+      
+      if(existingUser){
+        return res.send({message:"User Already Exist", insertedId:null})
+      }
+      else{
+        console.log("user API Req",user);
+
+        const result = await userCollection.insertOne(user);
+  
+        console.log("-------------------- Result----------",result);
+  
+        return res.send(result);
+  
+      }
+
+     
+    })
+
 
     app.get('/menu',async (req,res)=>{
       const result = await menuCollection.find().toArray();
